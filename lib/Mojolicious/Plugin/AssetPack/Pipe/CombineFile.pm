@@ -91,7 +91,7 @@ return sub {
 
 =head1 NAME
 
-Mojolicious::Plugin::AssetPack::Pipe::CombineFile - Store combined asset to cache file instred of memory.
+Mojolicious::Plugin::AssetPack::Pipe::CombineFile - Store combined asset to cache file instead of memory.
 
 
 =head1 SYNOPSIS
@@ -111,5 +111,12 @@ Get combined asset by url:
 
   //your-domain.com/assets/tmpl1.html
 
+=head1 SEE ALSO
+
+L<Mojolicious::Plugin::AssetPack::Che>
+
+=head1 AUTHOR
+
+Михаил Че (Mikhail Che), C<< <mche[-at-]cpan.org> >>
 
 =cut
