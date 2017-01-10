@@ -80,3 +80,36 @@ return sub {
 }
  
 1;
+
+=pod
+
+=encoding utf8
+
+Доброго всем
+
+¡ ¡ ¡ ALL GLORY TO GLORIA ! ! !
+
+=head1 NAME
+
+Mojolicious::Plugin::AssetPack::Pipe::CombineFile - Store combined asset to cache file instred of memory.
+
+
+=head1 SYNOPSIS
+
+  $app->plugin('AssetPack::Che' => {
+          pipes => [qw(Sass Css JavaScript CombineFile)],
+          process => {
+            'tmpl1.html'=>['templates/foo.html', 'templates/bar.html',],
+            ...,
+          },
+        });
+
+
+=head1 ROUTE
+
+Get combined asset by url:
+
+  //your-domain.com/assets/tmpl1.html
+
+
+=cut
