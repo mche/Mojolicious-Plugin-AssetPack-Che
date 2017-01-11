@@ -3,11 +3,11 @@ use Mojo::Base 'Mojolicious::Plugin::AssetPack::Pipe';
 use Mojolicious::Plugin::AssetPack::Util qw(checksum diag DEBUG);
  
 has enabled => sub { shift->assetpack->minify };
-has config => sub { shift->assetpack->config->{CombineFile} || {} };
+has config => sub { my $config = shift->assetpack->config; ($config && $config->{CombineFile}) || {}; };
 
 sub new {
   my $self = shift->SUPER::new(@_);
-  $self->assetpack->app->routes->route('/assets/*topic')->via(qw(HEAD GET))
+  $self->app->routes->route('/assets/*topic')->via(qw(HEAD GET))
     ->name('assetpack by topic')->to(cb => $self->_cb_route_by_topic);
   $self;
 }
@@ -48,6 +48,7 @@ sub process {
           unless $url_lines && exists $url_lines->{$url};# && !$url_lines->{$url};
         
         my $url_line = $url_lines->{$url};
+        utf8::encode($url_line);
         $_->content(sprintf("%s\n%s", $url_line,  $_->content));
 
       } );
