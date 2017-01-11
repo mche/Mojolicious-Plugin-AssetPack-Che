@@ -3,11 +3,11 @@ use Mojo::Base 'Mojolicious::Plugin::AssetPack::Pipe';
 use Mojolicious::Plugin::AssetPack::Util qw(checksum diag DEBUG);
  
 has enabled => sub { shift->assetpack->minify };
+has config => sub { shift->assetpack->config->{CombineFile} || die};
 
 sub new {
   my $self = shift->SUPER::new(@_);
-  $self->assetpack->store->_types->type('html', ['text/html;charset=UTF-8']);# Restore deleted Jan
-  $self->assetpack->_app->routes->route('/assets/*topic')->via(qw(HEAD GET))
+  $self->assetpack->app->routes->route('/assets/*topic')->via(qw(HEAD GET))
     ->name('assetpack by topic')->to(cb => $self->_cb_route_by_topic);
   $self;
 }
@@ -21,15 +21,15 @@ sub process {
   return unless $self->enabled;
  
   for my $asset (@$assets) {
-    if ($asset->isa('Mojolicious::Plugin::AssetPack::Asset::Null')) {
-      next;
-    }
-    elsif (grep { $asset->format eq $_ } qw(css js html)) {
-      push @$combine, $asset;
-    }
-    else {
-      push @other, $asset;
-    }
+    next
+      if $asset->isa('Mojolicious::Plugin::AssetPack::Asset::Null');
+    
+    push @$combine, $asset
+      and next
+      if grep $asset->format eq $_, qw(css js html);
+    
+    push @other, $asset;
+    
   }
   
   @$assets = ();
@@ -37,16 +37,24 @@ sub process {
   if (@$combine) {
     my $format = $combine->[0]->format;
     my $checksum = checksum $topic;#$combine->map('url')->join(':');
-    my $name = checksum $topic;
-    $combine->map(sub { $_->content(sprintf("@@@ %s\n%s", $_->url, $_->content)) } )
-      if $format eq 'html';
+    #~ my $name = checksum $topic;
+    if ($format eq 'html') {
+      my $names = $self->config->{html} && $self->config->{html}{names};
+      my $name = $self->config->{html} && $self->config->{html}{map_names} && $self->config->{html}{map_names}{$_->url};
+      
+      $combine->map(sub { $_->content(sprintf("%s%s\n%s", $names, $name || $_->url, $_->content)) } )
+        if defined $names;
+      
+      $self->assetpack->store->_types->type(html => ['text/html;charset=UTF-8'])# Restore deleted Jan
+        unless $self->assetpack->store->_types->type('html');
+    }
     my $content = $combine->map('content')->map(sub { /\n$/ ? $_ : "$_\n" })->join;
    
     diag 'Combining assets into "%s" with checksum[%s] and format[%s].', $topic, $checksum, $format
       if DEBUG;
     
     push @$assets,
-      $self->assetpack->store->save(\$content, {key => "combine-file", url=>$topic, name=>$name, checksum=>$checksum, minified=>1, format=>$format,})
+      $self->assetpack->store->save(\$content, {key => "combine-file", url=>$topic, name=>$checksum, checksum=>$checksum, minified=>1, format=>$format,})
   }
   
   push @$assets, @other;# preserve assets such as images and font files
@@ -59,7 +67,7 @@ return sub {
   my $topic = $c->stash('topic');
   
    my $assets = $assetpack->processed($topic)
-    or $c->render(text => "// The asset [$topic] does not exists or not found\n", status => 404)
+    or $c->render(text => "// The asset [$topic] does not exists (not processed) or not found\n", status => 404)
     and return;
 
   #~ return $c->render(text => $assets->map('content')->join);
@@ -98,12 +106,20 @@ Mojolicious::Plugin::AssetPack::Pipe::CombineFile - Store combined asset to cach
 
   $app->plugin('AssetPack::Che' => {
           pipes => [qw(Sass Css JavaScript CombineFile)],
+          CombineFile => {html=>{names=>"@@@ ", map_names=>{'templates/bar.html'=>'bar',},},},
           process => {
             'tmpl1.html'=>['templates/foo.html', 'templates/bar.html',],
             ...,
           },
         });
 
+=head1 CONFIG
+
+B<CombineFile> determine config for this pipe module. Hashref has keys for format extensions. Now implements only B<html> format options:
+
+B<names> - string for prepending inserting names to result asset content, if not defined then names will not inserts.
+
+B<map_names> - hashref maps url asset to other name, if not defined then use url of asset
 
 =head1 ROUTE
 

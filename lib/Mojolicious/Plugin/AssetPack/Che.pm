@@ -3,8 +3,11 @@ use Mojo::Base 'Mojolicious::Plugin::AssetPack';
 use Mojolicious::Plugin::AssetPack::Util qw( checksum );
 use Mojo::URL;
 
+has [qw(config)];
+
 sub register {
   my ($self, $app, $config) = @_;
+  $self->config($config);
   $self->SUPER::register($app, $config);
   
   my $process = $config->{process};
