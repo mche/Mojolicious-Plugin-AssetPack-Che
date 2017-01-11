@@ -32,8 +32,7 @@ sub process {
     
   }
   
-  #~ @$assets = ();
-  my @new = ();
+  my @process = ();
   
   if (@$combine) {
     my $format = $combine->[0]->format;
@@ -64,12 +63,12 @@ sub process {
     diag 'Combining assets into "%s" with checksum[%s] and format[%s].', $topic, $checksum, $format
       if DEBUG;
     
-    push @new,
+    push @process,
       $self->assetpack->store->save(\$content, {key => "combine-file", url=>$topic, name=>$checksum, checksum=>$checksum, minified=>1, format=>$format,})
   }
   
-  push @new, @other;# preserve assets such as images and font files
-  @$assets = @new;
+  push @process, @other;# preserve assets such as images and font files
+  @$assets = @process;
 }
 
 sub _cb_route_by_topic {
