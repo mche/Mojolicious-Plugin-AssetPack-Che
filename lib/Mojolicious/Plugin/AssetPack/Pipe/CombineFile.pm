@@ -40,20 +40,16 @@ sub process {
     my $checksum = checksum $topic;#$combine->map('url')->join(':');
     #~ my $name = checksum $topic;
     if ($format eq 'html') {# enabled always
-      my $names = $self->config->{html} && $self->config->{html}{names};
-      my $url_names = $self->config->{html} && $self->config->{html}{url_names};
+      #~ my $pre_name = $self->config->{html} && $self->config->{html}{pre_name};
+      my $url_lines = $self->config->{html} && $self->config->{html}{url_lines};
       
       $combine->map( sub {
-        
-        return
-          unless defined($names);
-        
         my $url = $_->url;
         return # 
-          if $url_names && exists($url_names->{$url}) && !$url_names->{$url};
+          unless $url_lines && exists $url_lines->{$url};# && !$url_lines->{$url};
         
-        my $map_name = $url_names && $url_names->{$url};
-        $_->content(sprintf("%s%s\n%s", $names, $map_name || $url,  $_->content));
+        my $url_line = $url_lines->{$url};
+        $_->content(sprintf("%s\n%s", $url_line,  $_->content));
 
       } );
       
@@ -122,7 +118,7 @@ Mojolicious::Plugin::AssetPack::Pipe::CombineFile - Store combined asset to cach
 
   $app->plugin('AssetPack::Che' => {
           pipes => [qw(Sass Css JavaScript CombineFile)],
-          CombineFile => {html=>{names=>"@@@ ", url_names=>{'templates/bar.html'=>'t/bar',},},},
+          CombineFile => {html=>{names=>"@@@ ", url_lines=>{'templates/bar.html'=>'t/bar',},},},
           process => {
             'tmpl1.html'=>['templates/foo.html', 'templates/bar.html',],
             ...,
@@ -135,11 +131,8 @@ B<CombineFile> determine config for this pipe module. Hashref has keys for forma
 
 Now implements only B<html> format options:
 
-B<names> - string for prepending inserting names to result asset content, if not defined then names will not inserts.
+B<url_lines> - hashref maps url of asset to some line and place this line as first in content, if not defined then no place first line to asset content.
 
-B<url_names> - hashref maps url asset to other name, if not defined then use url of asset
-
-Case the C<< url_names=>{< url >  => undef || 0 || '', } >> then name of url will be skip inserts.
 
 =head1 ROUTE
 
