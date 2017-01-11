@@ -136,9 +136,11 @@ Case the C<< map_names=>{< url >  => undef || 0 || '', } >> then name of url wil
 
 =head1 ROUTE
 
-Get combined asset by url:
+B</assets/*topic> will auto place.
 
-  //your-domain.com/assets/tmpl1.html
+Get combined asset by url
+
+  <scheme>//<host>/assets/tmpl1.html
 
 =head1 SEE ALSO
 
