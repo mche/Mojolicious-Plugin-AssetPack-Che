@@ -167,7 +167,8 @@ C_FILES  =
 O_FILES  = 
 H_FILES  = 
 MAN1PODS = 
-MAN3PODS = lib/Mojolicious/Plugin/AssetPack/Che.pm
+MAN3PODS = lib/Mojolicious/Plugin/AssetPack/Che.pm \
+	lib/Mojolicious/Plugin/AssetPack/Pipe/CombineFile.pm
 
 # Where is the Config information that we are using/depend on
 CONFIGDEP = $(PERL_ARCHLIBDEP)$(DFSEP)Config.pm $(PERL_INCDEP)$(DFSEP)config.h
@@ -418,9 +419,11 @@ POD2MAN = $(POD2MAN_EXE)
 
 
 manifypods : pure_all config  \
-	lib/Mojolicious/Plugin/AssetPack/Che.pm
+	lib/Mojolicious/Plugin/AssetPack/Che.pm \
+	lib/Mojolicious/Plugin/AssetPack/Pipe/CombineFile.pm
 	$(NOECHO) $(POD2MAN) --section=3 --perm_rw=$(PERM_RW) -u \
-	  lib/Mojolicious/Plugin/AssetPack/Che.pm $(INST_MAN3DIR)/Mojolicious::Plugin::AssetPack::Che.$(MAN3EXT) 
+	  lib/Mojolicious/Plugin/AssetPack/Che.pm $(INST_MAN3DIR)/Mojolicious::Plugin::AssetPack::Che.$(MAN3EXT) \
+	  lib/Mojolicious/Plugin/AssetPack/Pipe/CombineFile.pm $(INST_MAN3DIR)/Mojolicious::Plugin::AssetPack::Pipe::CombineFile.$(MAN3EXT) 
 
 
 

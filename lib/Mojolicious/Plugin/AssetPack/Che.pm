@@ -13,7 +13,7 @@ sub register {
   
   my $process = $config->{process};
   $self->process(ref eq 'ARRAY' ? @$_ : $_) #($_->[0], map Mojo::URL->new($_), @$_[1..$#$_])
-    for ref $process eq 'HASH' ? map([$_=> @{$process->{$_}}], keys %$process) : ref $process eq 'ARRAY' ? @$process : ();
+    for ref $process eq 'HASH' ? map([$_=> ref $process->{$_} eq 'ARRAY' ? @{$process->{$_}} : $process->{$_}], keys %$process) : ref $process eq 'ARRAY' ? @$process : ();
   
   
   
