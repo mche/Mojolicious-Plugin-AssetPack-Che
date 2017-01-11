@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin::AssetPack::Pipe';
 use Mojolicious::Plugin::AssetPack::Util qw(checksum diag DEBUG);
  
 has enabled => sub { shift->assetpack->minify };
-has config => sub { shift->assetpack->config->{CombineFile} || die};
+has config => sub { shift->assetpack->config->{CombineFile} };
 
 sub new {
   my $self = shift->SUPER::new(@_);
