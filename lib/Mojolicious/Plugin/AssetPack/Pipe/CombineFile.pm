@@ -41,7 +41,7 @@ sub process {
     #~ my $name = checksum $topic;
     if ($format eq 'html') {# enabled always
       #~ my $pre_name = $self->config->{html} && $self->config->{html}{pre_name};
-      my $url_lines = $self->config->{html} && $self->config->{html}{url_lines};
+      my $url_lines = $self->config->{url_lines};
       
       $combine->map( sub {
         my $url = $_->url;
@@ -127,11 +127,9 @@ Mojolicious::Plugin::AssetPack::Pipe::CombineFile - Store combined asset to cach
 
 =head1 CONFIG
 
-B<CombineFile> determine config for this pipe module. Hashref has keys for format extensions.
+B<CombineFile> determine config for this pipe module. Hashref has keys for format extensions and also:
 
-Now implements only B<html> format options:
-
-B<url_lines> - hashref maps url of asset to some line and place this line as first in content, if not defined then no place first line to asset content.
+B<url_lines> - hashref maps url of asset to some line and place this line as first in content. If not defined thecontent will not change.
 
 
 =head1 ROUTE
