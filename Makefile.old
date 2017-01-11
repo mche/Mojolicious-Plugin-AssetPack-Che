@@ -19,7 +19,7 @@
 #     MIN_PERL_VERSION => q[5.006]
 #     NAME => q[Mojolicious::Plugin::AssetPack::Che]
 #     PL_FILES => {  }
-#     PREREQ_PM => { Mojolicious::Plugin::AssetPack=>q[1.28], Test::More=>q[0] }
+#     PREREQ_PM => { HTML::Packer=>q[2.03], Mojolicious::Plugin::AssetPack=>q[1.33], Test::More=>q[0] }
 #     TEST_REQUIRES => {  }
 #     VERSION_FROM => q[lib/Mojolicious/Plugin/AssetPack/Che.pm]
 #     dist => { COMPRESS=>q[gzip -9f], SUFFIX=>q[gz] }
@@ -193,7 +193,8 @@ PERL_ARCHIVE_AFTER =
 
 TO_INST_PM = README.pod \
 	lib/Mojolicious/Plugin/AssetPack/Che.pm \
-	lib/Mojolicious/Plugin/AssetPack/Pipe/CombineFile.pm
+	lib/Mojolicious/Plugin/AssetPack/Pipe/CombineFile.pm \
+	lib/Mojolicious/Plugin/AssetPack/Pipe/HTML.pm
 
 
 # --- MakeMaker platform_constants section:
@@ -510,7 +511,8 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '    - t' >> META_new.yml
 	$(NOECHO) $(ECHO) '    - inc' >> META_new.yml
 	$(NOECHO) $(ECHO) 'requires:' >> META_new.yml
-	$(NOECHO) $(ECHO) '  Mojolicious::Plugin::AssetPack: '\''1.28'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  HTML::Packer: '\''2.03'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Mojolicious::Plugin::AssetPack: '\''1.33'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  perl: '\''5.006'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'version: '\''1.33'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'x_serialization_backend: '\''CPAN::Meta::YAML version 0.018'\''' >> META_new.yml
@@ -550,7 +552,8 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '      },' >> META_new.json
 	$(NOECHO) $(ECHO) '      "runtime" : {' >> META_new.json
 	$(NOECHO) $(ECHO) '         "requires" : {' >> META_new.json
-	$(NOECHO) $(ECHO) '            "Mojolicious::Plugin::AssetPack" : "1.28",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "HTML::Packer" : "2.03",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Mojolicious::Plugin::AssetPack" : "1.33",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "perl" : "5.006"' >> META_new.json
 	$(NOECHO) $(ECHO) '         }' >> META_new.json
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
@@ -871,7 +874,8 @@ ppd :
 	$(NOECHO) $(ECHO) '    <AUTHOR>ÐÐ¸ÑÐ°Ð¸Ð» Ð§Ðµ (Mikhail Che) &lt;mche&lt;-on-&gt;cpan.org&gt;</AUTHOR>' >> Mojolicious-Plugin-AssetPack-Che.ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> Mojolicious-Plugin-AssetPack-Che.ppd
 	$(NOECHO) $(ECHO) '        <PERLCORE VERSION="5,006,0,0" />' >> Mojolicious-Plugin-AssetPack-Che.ppd
-	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Mojolicious::Plugin::AssetPack" VERSION="1.28" />' >> Mojolicious-Plugin-AssetPack-Che.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="HTML::Packer" VERSION="2.03" />' >> Mojolicious-Plugin-AssetPack-Che.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Mojolicious::Plugin::AssetPack" VERSION="1.33" />' >> Mojolicious-Plugin-AssetPack-Che.ppd
 	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="x86_64-linux-5.25" />' >> Mojolicious-Plugin-AssetPack-Che.ppd
 	$(NOECHO) $(ECHO) '        <CODEBASE HREF="" />' >> Mojolicious-Plugin-AssetPack-Che.ppd
 	$(NOECHO) $(ECHO) '    </IMPLEMENTATION>' >> Mojolicious-Plugin-AssetPack-Che.ppd
@@ -884,7 +888,8 @@ pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	$(NOECHO) $(ABSPERLRUN) -MExtUtils::Install -e 'pm_to_blib({@ARGV}, '\''$(INST_LIB)/auto'\'', q[$(PM_FILTER)], '\''$(PERM_DIR)'\'')' -- \
 	  'README.pod' '$(INST_LIB)/Mojolicious/Plugin/AssetPack/README.pod' \
 	  'lib/Mojolicious/Plugin/AssetPack/Che.pm' 'blib/lib/Mojolicious/Plugin/AssetPack/Che.pm' \
-	  'lib/Mojolicious/Plugin/AssetPack/Pipe/CombineFile.pm' 'blib/lib/Mojolicious/Plugin/AssetPack/Pipe/CombineFile.pm' 
+	  'lib/Mojolicious/Plugin/AssetPack/Pipe/CombineFile.pm' 'blib/lib/Mojolicious/Plugin/AssetPack/Pipe/CombineFile.pm' \
+	  'lib/Mojolicious/Plugin/AssetPack/Pipe/HTML.pm' 'blib/lib/Mojolicious/Plugin/AssetPack/Pipe/HTML.pm' 
 	$(NOECHO) $(TOUCH) pm_to_blib
 
 
