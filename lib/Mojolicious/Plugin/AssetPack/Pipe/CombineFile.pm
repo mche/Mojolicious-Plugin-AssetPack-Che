@@ -18,7 +18,7 @@ sub process {
   my @other;
   my $topic = $self->topic;
  
-  return unless $self->enabled;
+  #~ return unless $self->enabled;!!! below
  
   for my $asset (@$assets) {
     next
@@ -32,7 +32,8 @@ sub process {
     
   }
   
-  @$assets = ();
+  #~ @$assets = ();
+  my @new = ();
   
   if (@$combine) {
     my $format = $combine->[0]->format;
@@ -58,17 +59,20 @@ sub process {
       
       $self->assetpack->store->_types->type(html => ['text/html;charset=UTF-8'])# Restore deleted Jan
         unless $self->assetpack->store->_types->type('html');
+    } else {
+      return unless $self->enabled;
     }
     my $content = $combine->map('content')->map(sub { /\n$/ ? $_ : "$_\n" })->join;
    
     diag 'Combining assets into "%s" with checksum[%s] and format[%s].', $topic, $checksum, $format
       if DEBUG;
     
-    push @$assets,
+    push @new,
       $self->assetpack->store->save(\$content, {key => "combine-file", url=>$topic, name=>$checksum, checksum=>$checksum, minified=>1, format=>$format,})
   }
   
-  push @$assets, @other;# preserve assets such as images and font files
+  push @new, @other;# preserve assets such as images and font files
+  @$assets = @new;
 }
 
 sub _cb_route_by_topic {
