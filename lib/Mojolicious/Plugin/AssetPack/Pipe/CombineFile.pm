@@ -40,10 +40,21 @@ sub process {
     #~ my $name = checksum $topic;
     if ($format eq 'html') {
       my $names = $self->config->{html} && $self->config->{html}{names};
-      my $name = $self->config->{html} && $self->config->{html}{map_names} && $self->config->{html}{map_names}{$_->url};
+      my $map_names = $self->config->{html} && $self->config->{html}{map_names};
       
-      $combine->map(sub { $_->content(sprintf("%s%s\n%s", $names, $name || $_->url, $_->content)) } )
-        if defined $names;
+      $combine->map( sub {
+        
+        return
+          unless defined($names);
+        
+        my $url = $_->url;
+        return # 
+          if $map_names && exists($map_names->{$url}) && !$map_names->{$url};
+        
+        my $map_name = $map_names && $map_names->{$url};
+        $_->content(sprintf("%s%s\n%s", $names, $map_name || $url,  $_->content));
+
+      } );
       
       $self->assetpack->store->_types->type(html => ['text/html;charset=UTF-8'])# Restore deleted Jan
         unless $self->assetpack->store->_types->type('html');
@@ -73,9 +84,9 @@ return sub {
   #~ return $c->render(text => $assets->map('content')->join);
   my $format = $assets->[0]->format;
   my $checksum = checksum $topic;#assets->map('checksum')->join(':');
-  my $name = checksum $topic;
+  #~ my $name = checksum $topic;
   
-  my $asset = $assetpack->store->load({key => "combine-file", url=>$topic, name=>$name, checksum => $checksum, minified=>1, format=>$format});#  $format eq 'html' ? 0 : 1
+  my $asset = $assetpack->store->load({key => "combine-file", url=>$topic, name=>$checksum, checksum => $checksum, minified=>1, format=>$format});#  $format eq 'html' ? 0 : 1
   
   #~ warn $c->dumper($asset);#->format('tmpl')
   
@@ -120,6 +131,8 @@ B<CombineFile> determine config for this pipe module. Hashref has keys for forma
 B<names> - string for prepending inserting names to result asset content, if not defined then names will not inserts.
 
 B<map_names> - hashref maps url asset to other name, if not defined then use url of asset
+
+Case the C<< map_names=>{< url >  => undef || 0 || '', } >> then name of url will be skip inserts.
 
 =head1 ROUTE
 
