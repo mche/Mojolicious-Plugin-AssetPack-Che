@@ -18,14 +18,14 @@ sub process {
       my $attrs = $asset->TO_JSON;
       $attrs->{key}      = 'html-min';
       $attrs->{minified} = 1;
-      return if $asset->format ne 'html' or $asset->minified;
-      return $asset->content($file)->minified(1)
-        if $file = $store->load($attrs);
       
-      return unless length(my $content = $asset->content);
+      $asset->format ne 'html' || $asset->minified && return;
+      ($file = $store->load($attrs)) && return $asset->content($file)->minified(1);
+      length(my $content = $asset->content) || return;
+      
       load_module 'HTML::Packer'
-        or die qq(Could not load "HTML::Packer": $@);
-      diag 'Minify "%s" with checksum %s.', $asset->url, $asset->checksum if DEBUG;
+        || die qq(Could not load "HTML::Packer": $@);
+      DEBUG && diag 'Minify "%s" with checksum %s.', $asset->url, $asset->checksum;
       HTML::Packer::minify(\$content, $self->minify_opts);
       $asset->content($store->save(\$content, $attrs))->minified(1);
     }

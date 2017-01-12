@@ -61,8 +61,7 @@ sub process {
     }
     my $content = $combine->map('content')->map(sub { /\n$/ ? $_ : "$_\n" })->join;
    
-    diag 'Combining assets into "%s" with checksum[%s] and format[%s].', $topic, $checksum, $format
-      if DEBUG;
+    DEBUG && diag 'Combining assets into "%s" with checksum[%s] and format[%s].', $topic, $checksum, $format;
     
     push @process,
       $self->assetpack->store->save(\$content, {key => "combine-file", url=>$topic, name=>$checksum, checksum=>$checksum, minified=>1, format=>$format,})
