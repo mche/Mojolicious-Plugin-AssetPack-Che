@@ -18,9 +18,9 @@ WriteMakefile(
         'Test::More' => 0,
     },
     PREREQ_PM => {
-        'Mojolicious::Plugin::AssetPack'              => 1.33,
+        'Mojolicious::Plugin::AssetPack'              => 1.39,
         'HTML::Packer'=> 2.03,
-        #'Foo::Bar::Module' => 5.0401,
+        'IO::Compress::Gzip '=>2,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     #clean => { FILES => 'Mojolicious-Plugin-AssetPack-Che-*' },

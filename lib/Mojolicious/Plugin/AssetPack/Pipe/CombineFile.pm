@@ -1,9 +1,11 @@
 package Mojolicious::Plugin::AssetPack::Pipe::CombineFile;
 use Mojo::Base 'Mojolicious::Plugin::AssetPack::Pipe';
 use Mojolicious::Plugin::AssetPack::Util qw(checksum diag DEBUG);
+use IO::Compress::Gzip 'gzip';
  
 has enabled => sub { shift->assetpack->minify };
 has config => sub { my $config = shift->assetpack->config; ($config && $config->{CombineFile}) || {}; };
+has serve => sub { shift->assetpack->serve_cb };
 
 sub new {
   my $self = shift->SUPER::new(@_);
@@ -63,8 +65,13 @@ sub process {
    
     DEBUG && diag 'Combining assets into "%s" with checksum[%s] and format[%s].', $topic, $checksum, $format;
     
+    
     push @process,
-      $self->assetpack->store->save(\$content, {key => "combine-file", url=>$topic, name=>$checksum, checksum=>$checksum, minified=>1, format=>$format,})
+      $self->assetpack->store->save(\$content, {key => "combine-file", url=>$topic, name=>$checksum, checksum=>$checksum, minified=>1, format=>$format,});
+    
+    gzip \($content->to_string) => \(my $gzip), {-Level => 9};
+    my $checksum_gzip = checksum($topic.'.gzip');
+    $self->assetpack->{by_checksum}{$checksum_gzip} = $self->assetpack->store->save(\$gzip, {key => "combine-file-gzip", url=>$topic.'.gzip', name=>$topic.'.gzip', checksum=>$checksum_gzip, minified=>1, format=>$format,}),
   }
   
   push @process, @other;# preserve assets such as images and font files
@@ -72,29 +79,29 @@ sub process {
 }
 
 sub _cb_route_by_topic {
-  my $assetpack  =shift->assetpack;
+  my $self = shift;
+  #~ my $assetpack  =$self->assetpack;
 return sub {
   my $c  = shift;
   my $topic = $c->stash('topic');
+  $c->stash('name'=>checksum $topic);
+  $c->stash('checksum'=>checksum $topic);
+  return $self->serve->($c);
   
-   my $assets = $assetpack->processed($topic)
-    or $c->render(text => "// The asset [$topic] does not exists (not processed) or not found\n", status => 404)
-    and return;
+   #~ my $assets = $assetpack->processed($topic)
+    #~ or $c->render(text => "// The asset [$topic] does not exists (not processed) or not found\n", status => 404)
+    #~ and return;
 
-  #~ return $c->render(text => $assets->map('content')->join);
-  my $format = $assets->[0]->format;
-  my $checksum = checksum $topic;#assets->map('checksum')->join(':');
-  #~ my $name = checksum $topic;
+  #~ my $format = $assets->[0]->format;
+  #~ my $checksum = checksum $topic;#assets->map('checksum')->join(':');
   
-  my $asset = $assetpack->store->load({key => "combine-file", url=>$topic, name=>$checksum, checksum => $checksum, minified=>1, format=>$format});#  $format eq 'html' ? 0 : 1
+  #~ my $asset = $assetpack->store->load({key => "combine-file", url=>$topic, name=>$checksum, checksum => $checksum, minified=>1, format=>$format});#  $format eq 'html' ? 0 : 1
   
-  #~ warn $c->dumper($asset);#->format('tmpl')
-  
-  $assetpack->store->serve_asset($c, $asset)
-    and return $c->rendered
-    if $asset;
+  #~ $assetpack->store->serve_asset($c, $asset)
+    #~ and return $c->rendered
+    #~ if $asset;
  
-  $c->render(text => "// No such asset [$topic]\n", status => 404);
+  #~ $c->render(text => "// No such asset [$topic]\n", status => 404);
 };
 }
  

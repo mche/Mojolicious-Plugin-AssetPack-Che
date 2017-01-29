@@ -12,11 +12,33 @@ sub register {
   Scalar::Util::weaken($self->{app});
   $self->SUPER::register($app, $config);
   
+  # Patch the asset route
+  $self->route;
+  $app->routes->find('assetpack')->pattern->defaults->{cb} = $self->serve_cb();
+  
   my $process = $config->{process};
   $self->process(ref eq 'ARRAY' ? @$_ : $_) #($_->[0], map Mojo::URL->new($_), @$_[1..$#$_])
     for ref $process eq 'HASH' ? map([$_=> ref $process->{$_} eq 'ARRAY' ? @{$process->{$_}} : $process->{$_}], keys %$process) : ref $process eq 'ARRAY' ? @$process : ();
   
   return $self;
+}
+
+sub serve_cb {
+  my $self= shift;
+  return sub {
+    my $c = shift;
+    my $checksum = $c->stash('checksum');
+    if (($c->req->headers->accept_encoding // '') =~ /gzip/i && (my $asset = $self->{by_checksum}{$checksum})) {
+      #~ warn "GZIP!", $c->dumper($c->req->headers);
+      my $checksum_gzip = checksum($asset->url.'.gzip');
+      $asset = $self->{by_checksum}{$checksum_gzip}
+        and $c->res->headers->content_encoding('gzip')
+        and $self->store->serve_asset($c, $asset)
+        and return $c->rendered;
+    }
+    Mojolicious::Plugin::AssetPack::_serve($c, @_);
+  };
+  
 }
 
 
@@ -36,11 +58,11 @@ Since version 1.28.
 
 =head1 VERSION
 
-Version 1.33
+Version 1.39
 
 =cut
 
-our $VERSION = '1.33';
+our $VERSION = '1.39';
 
 
 =head1 SYNOPSIS
