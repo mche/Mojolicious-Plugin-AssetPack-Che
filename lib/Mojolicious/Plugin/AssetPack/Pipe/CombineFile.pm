@@ -4,7 +4,7 @@ use Mojolicious::Plugin::AssetPack::Util qw(checksum diag DEBUG);
 use IO::Compress::Gzip 'gzip';
  
 has enabled => sub { shift->assetpack->minify };
-has config => sub { my $config = shift->assetpack->config; ($config && $config->{CombineFile}) || {}; };
+has config => sub { my $self = shift; my $config = $self->assetpack->config || $self->assetpack->config({}); $config->{CombineFile} ||= {}; };
 has serve => sub { shift->assetpack->serve_cb };
 
 sub new {
@@ -64,14 +64,17 @@ sub process {
     my $content = $combine->map('content')->map(sub { /\n$/ ? $_ : "$_\n" })->join;
    
     DEBUG && diag 'Combining assets into "%s" with checksum[%s] and format[%s].', $topic, $checksum, $format;
-    
-    
+
     push @process,
       $self->assetpack->store->save(\$content, {key => "combine-file", url=>$topic, name=>$checksum, checksum=>$checksum, minified=>1, format=>$format,});
     
-    gzip \($content->to_string) => \(my $gzip), {-Level => 9};
-    my $checksum_gzip = checksum($topic.'.gzip');
-    $self->assetpack->{by_checksum}{$checksum_gzip} = $self->assetpack->store->save(\$gzip, {key => "combine-file-gzip", url=>$topic.'.gzip', name=>$topic.'.gzip', checksum=>$checksum_gzip, minified=>1, format=>$format,}),
+    if ($self->config->{gzip} && ($self->config->{gzip}{min_size} || 1000) < $content->size) {
+      gzip \($content->to_string) => \(my $gzip), {-Level => 9};
+      my $checksum_gzip = checksum($topic.'.gzip');
+      DEBUG && diag 'GZIP asset topic=[%s] with checksum=[%s] and format=[%s] and rate=[%s/%s].', $topic, $checksum, $format, $content->size, length($gzip);
+      $self->assetpack->{by_checksum}{$checksum_gzip} = $self->assetpack->store->save(\$gzip, {key => "combine-file-gzip", url=>$topic.'.gzip', name=>$topic.'.gzip', checksum=>$checksum_gzip, minified=>1, format=>$format,});
+      
+    }
   }
   
   push @process, @other;# preserve assets such as images and font files

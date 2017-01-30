@@ -23,6 +23,30 @@ sub register {
   return $self;
 }
 
+sub process {# redefine for nested topics
+  my ($self, $topic, @input) = @_;
+ 
+  $self->route unless $self->{route_added}++;
+  return $self->_process_from_def($topic) unless @input;
+ 
+  # TODO: The idea with blessed($_) is that maybe the user can pass inn
+  # Mojolicious::Plugin::AssetPack::Sprites object, with images to generate
+  # CSS from?
+  my $assets = Mojo::Collection->new;
+  for my $url (@input) {
+    if (my $nested = $self->processed($url)) {
+      push @$assets, @$nested;
+      next;
+    }
+    my $asset = Scalar::Util::blessed($url) ? $url : $self->store->asset($url);
+    die qq(Could not find input asset "$url".) unless Scalar::Util::blessed($asset);
+    push @$assets, $asset;
+  }
+ 
+  return $self->tap(sub { $_->{input}{$topic} = $assets }) if $self->{lazy};
+  return $self->_process($topic => $assets);
+}
+
 sub serve_cb {
   my $self= shift;
   return sub {
