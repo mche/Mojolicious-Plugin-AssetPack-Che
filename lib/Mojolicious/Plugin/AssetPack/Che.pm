@@ -72,21 +72,31 @@ sub serve_cb {
 
 Доброго всем
 
+=head1 Mojolicious::Plugin::AssetPack::Che
+
 ¡ ¡ ¡ ALL GLORY TO GLORIA ! ! !
 
 =head1 NAME
 
 Mojolicious::Plugin::AssetPack::Che - Child of Mojolicious::Plugin::AssetPack for little bit code.
 
+=head1 DESCRIPTION
+
+Can process assets during register plugin.
+
+Can pipe HTML files with L<Mojolicious::Plugin::AssetPack::Pipe::HTML>.
+
+Can pipe CSS, JS, JSON, HTML with L<Mojolicious::Plugin::AssetPack::Pipe::CombineFile> into disk cache. This pipe can also gzip and cache gzipped assets.
+
 Since version 1.28.
 
 =head1 VERSION
 
-Version 1.39
+Version 1.40
 
 =cut
 
-our $VERSION = '1.39';
+our $VERSION = '1.40';
 
 
 =head1 SYNOPSIS
