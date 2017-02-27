@@ -28,7 +28,7 @@ sub process {
     
     push @$combine, $asset
       and next
-      if grep $asset->format eq $_, qw(css js html);
+      if grep $asset->format eq $_, qw(css js json html);
     
     push @other, $asset;
     
@@ -40,7 +40,11 @@ sub process {
     my $format = $combine->[0]->format;
     my $checksum = checksum $topic;#$combine->map('url')->join(':');
     #~ my $name = checksum $topic;
-    if ($format eq 'html') {# enabled always
+    return
+      unless $self->enabled || $format ~~ ['html', 'json'];
+    
+    
+    if ($format  eq 'html') {# enabled always
       #~ my $pre_name = $self->config->{html} && $self->config->{html}{pre_name};
       my $url_lines = $self->config->{url_lines};
       
@@ -58,9 +62,7 @@ sub process {
       $self->assetpack->store->_types->type(html => ['text/html;charset=UTF-8'])# Restore deleted Jan
         unless $self->assetpack->store->_types->type('html');
       
-    } else {
-      return unless $self->enabled;
-    }
+    } 
     my $content = $combine->map('content')->map(sub { /\n$/ ? $_ : "$_\n" })->join;
    
     DEBUG && diag 'Combining assets into "%s" with checksum[%s] and format[%s].', $topic, $checksum, $format;
