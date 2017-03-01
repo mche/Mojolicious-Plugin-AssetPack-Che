@@ -92,11 +92,11 @@ Since version 1.28.
 
 =head1 VERSION
 
-Version 1.41
+Version 1.40
 
 =cut
 
-our $VERSION = '1.41';
+our $VERSION = '1.40';
 
 
 =head1 SYNOPSIS
