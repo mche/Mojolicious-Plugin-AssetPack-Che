@@ -7,10 +7,10 @@ checksum=9c346fc356
 format=css
 minified=1
 [combine-file:main.css]
-checksum=b51c455b44
+checksum=33e0a7d96f
 format=css
 minified=1
 [combine-file:t1.html]
-checksum=3e8c1f5dd7
+checksum=1409af05a5
 format=html
 minified=1
