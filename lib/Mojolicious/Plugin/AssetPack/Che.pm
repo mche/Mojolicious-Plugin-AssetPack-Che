@@ -66,6 +66,15 @@ sub serve_cb {
   
 }
 
+# override for utf8
+#~ sub Mojolicious::Plugin::AssetPack::Util::checksum {
+  #~ substr Mojo::Util::sha1_sum(Mojo::Util::encode('UTF-8', $_[0])), 0, $Mojolicious::Plugin::AssetPack::Util::SUM_LEN;
+#~ }
+
+#~ sub checksum {
+  #~ substr Mojo::Util::sha1_sum(Mojo::Util::encode('UTF-8', $_[0])), 0, $Mojolicious::Plugin::AssetPack::Util::SUM_LEN;
+#~ }
+
 
 =pod
 
@@ -93,11 +102,11 @@ Since version 1.28.
 
 =head1 VERSION
 
-Version 1.452 (test on base Mojolicious::Plugin::AssetPack v1.45)
+Version 2.021 (test on base Mojolicious::Plugin::AssetPack v2.02)
 
 =cut
 
-our $VERSION = '1.452';
+our $VERSION = '2.021';
 
 
 =head1 SYNOPSIS
@@ -106,11 +115,16 @@ See parent module L<Mojolicious::Plugin::AssetPack> for full documentation.
 
 On register the plugin  C<config> can contain additional optional argument B<process>:
 
-  $app->plugin(AssetPack => pipes => [...], process => {foo.js=>[...], ...});
-  # or
-  $app->plugin(AssetPack => pipes => [...], process => [[foo.js=>(...)], ...]);
-  # or
-  $app->plugin(AssetPack => pipes => [...], process => [$definition_file1, ...]);
+  $app->plugin('AssetPack::Che',
+    pipes => [qw(Sass Css JavaScript HTML CombineFile)],
+    CombineFile => { gzip => {min_size => 1000},}, # pipe options
+    HTML => {minify_opts=>{remove_newlines => 1,}},# pipe based on HTML::Packer
+    process => [
+      ['foo.js'=>qw(path/to/foo1.js path/to/foo2.js)],
+      ['foo.html'=>qw(path/to/foo1.html path/to/foo2.html)],
+      ...
+    ],
+  );
 
 
 =head1 SEE ALSO
@@ -127,7 +141,7 @@ Please report any bugs or feature requests at L<https://github.com/mche/Mojolici
 
 =head1 COPYRIGHT
 
-Copyright 2016 Mikhail Che.
+Copyright 2016-2018 Mikhail Che.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

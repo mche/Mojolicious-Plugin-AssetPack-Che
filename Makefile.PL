@@ -25,6 +25,16 @@ WriteMakefile(
         'CSS::Sass'     =>  3.0,
         'JavaScript::Minifier::XS'     => 0.1,
     },
+      META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources => {
+          repository => {
+            type => 'git',
+            url => 'git://github.com/mche/Mojolicious-Plugin-AssetPack-Che.git',
+            web => 'https://github.com/mche/Mojolicious-Plugin-AssetPack-Che',
+          },
+        },
+      },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     #clean => { FILES => 'Mojolicious-Plugin-AssetPack-Che-*' },
 );
