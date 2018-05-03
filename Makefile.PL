@@ -18,12 +18,12 @@ WriteMakefile(
         'Test::More' => 0,
     },
     PREREQ_PM => {
-        'Mojolicious::Plugin::AssetPack'              => 1.39,
-        'HTML::Packer'=> 2.03,
-        'IO::Compress::Gzip '=>2.0,
-        'CSS::Minifier::XS'	=> 0.09,
-        'CSS::Sass'     =>  3.0,
-        'JavaScript::Minifier::XS'     => 0.1,
+        'Mojolicious::Plugin::AssetPack'              => '2.02',
+        'HTML::Packer'=> '2.03',
+        'IO::Compress::Gzip '=> '2.0',
+        'CSS::Minifier::XS'	=> '0.09',
+        'CSS::Sass'     =>  '3.0',
+        'JavaScript::Minifier::XS'     => '0.1',
     },
       META_MERGE => {
         'meta-spec' => { version => 2 },

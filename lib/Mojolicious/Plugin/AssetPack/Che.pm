@@ -2,6 +2,15 @@ package Mojolicious::Plugin::AssetPack::Che;
 use Mojo::Base 'Mojolicious::Plugin::AssetPack';
 use Mojolicious::Plugin::AssetPack::Util qw( checksum );
 use Mojo::URL;
+#~ use Mojo::Util qw(monkey_patch);
+
+BEGIN {
+  #~ # override for utf8
+  *Mojolicious::Plugin::AssetPack::Util::checksum = sub {
+  #~ monkey_patch 'Mojolicious::Plugin::AssetPack::Util', 'checksum'=>sub {
+    substr Mojo::Util::sha1_sum(Mojo::Util::encode('UTF-8', $_[0])), 0, $Mojolicious::Plugin::AssetPack::Util::SUM_LEN;
+  };
+}
 
 has [qw(app config)];
 
@@ -71,9 +80,6 @@ sub serve_cb {
   #~ substr Mojo::Util::sha1_sum(Mojo::Util::encode('UTF-8', $_[0])), 0, $Mojolicious::Plugin::AssetPack::Util::SUM_LEN;
 #~ }
 
-#~ sub checksum {
-  #~ substr Mojo::Util::sha1_sum(Mojo::Util::encode('UTF-8', $_[0])), 0, $Mojolicious::Plugin::AssetPack::Util::SUM_LEN;
-#~ }
 
 
 =pod
@@ -102,11 +108,11 @@ Since version 1.28.
 
 =head1 VERSION
 
-Version 2.021 (test on base Mojolicious::Plugin::AssetPack v2.02)
+Version 2.022 (test on base Mojolicious::Plugin::AssetPack v2.02)
 
 =cut
 
-our $VERSION = '2.021';
+our $VERSION = '2.022';
 
 
 =head1 SYNOPSIS
