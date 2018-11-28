@@ -18,6 +18,8 @@ sub register {
   $app->routes->find('assetpack')->pattern->defaults->{cb} = $self->serve_cb();
   
   $self->store->_types->type(html => ['text/html;charset=UTF-8']);# Restore deleted Jan
+  $self->store->default_headers($config->{default_headers})
+    if $config->{default_headers};
   
   my $process = $config->{process};
   $self->process(ref eq 'ARRAY' ? @$_ : $_) #($_->[0], map Mojo::URL->new($_), @$_[1..$#$_])
@@ -26,7 +28,8 @@ sub register {
   return $self;
 }
 
-sub process {# redefine for nested topics
+# redefine for nested topics
+sub process {
   my ($self, $topic, @input) = @_;
   utf8::encode($topic);
  
@@ -96,11 +99,11 @@ Since version 1.28.
 
 =head1 VERSION
 
-Version 2.031 (test on base Mojolicious::Plugin::AssetPack v2.02+)
+Version 2.06 (test on base Mojolicious::Plugin::AssetPack v2.02+)
 
 =cut
 
-our $VERSION = '2.031';
+our $VERSION = '2.06';
 
 
 =head1 SYNOPSIS
