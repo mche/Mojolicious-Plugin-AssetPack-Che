@@ -1,0 +1,26 @@
+<template>
+  <div class="hello">
+    <h1>{{ msg }}</h1>
+    
+    <h3>Установленные CLI Plugins</h3>
+    <ul>
+      <li v-for="a in plugins" :key="a.href">
+        <a  :href="a.href"  target="_blank"  rel="noopener">{{ a.name }}</a>
+      </li>
+    </ul>
+    
+    <h3>Essential Links</h3>
+    <ul>
+      <li v-for="a in essential" :key="a.href">
+        <a :href="a.href" target="_blank" rel="noopener">{{ a.name }}</a>
+      </li>
+    </ul>
+    
+    <h3>Эко Система</h3>
+    <ul>
+      <li v-for="a in ecosystem" :key="a.href">
+        <a :href="a.href" target="_blank" rel="noopener">{{ a.name }}</a>
+      </li>
+    </ul>
+  </div>
+</template>
