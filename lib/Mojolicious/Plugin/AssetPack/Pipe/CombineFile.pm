@@ -132,9 +132,9 @@ Mojolicious::Plugin::AssetPack::Pipe::CombineFile - Store combined and gzipped a
 
 =head1 CONFIG
 
-B<CombineFile> determine config for this pipe module. Hashref has keys for format extensions and also:
+B<CombineFile> determine config for this pipe module. Hashref keys:
 
-B<gzip> - options.
+B<gzip> - hashref options.
 
 
 =head1 ROUTE

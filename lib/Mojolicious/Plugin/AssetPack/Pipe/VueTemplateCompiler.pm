@@ -175,7 +175,7 @@ Mojolicious::Plugin::AssetPack::Pipe::VueTemplateCompiler - if you like separate
 
   $app->plugin('AssetPack::Che' => {
           pipes => [qw(VueTemplateCompiler CombineFile)],
-          VueTemplateCompiler=>{enabled=>$ENV{MOJO_ASSETPACK_VUE_TEMPLATE_COMPILER} || 0},
+          VueTemplateCompiler=>{enabled=>$ENV{MOJO_ASSETPACK_VUE_TEMPLATE_COMPILER} || 0},# pipe options
           process => [
             ['js/dist/templates/app★.js?bla'=>qw(components/foo.vue.html components/bar.vue.html)],
             ['app.js'=>qw('js/dist/templates/app★.js components/foo.vue.js components/bar.vue.js)],
@@ -200,7 +200,7 @@ Mojolicious::Plugin::AssetPack::Pipe::VueTemplateCompiler - if you like separate
 
 =head1 Конфигурация CONFIG
 
-Обработка файлов-шаблонов B< <path|url>.vue.html > пойдет только (ONLY) в режиме development.
+Обработка файлов-шаблонов B<< \<path|url>.vue.html >> пойдет только (ONLY) в режиме development.
 
 Обработанные топики шаблонов сохраняются в пути этого топика относительно static L<https://metacpan.org/pod/Mojolicious#static>.
 
