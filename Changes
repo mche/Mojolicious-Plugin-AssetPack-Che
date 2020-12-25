@@ -8,3 +8,7 @@ Revision history for Mojolicious-Plugin-AssetPack-Che
 
 2.102 	2020-12-23
      Mojolicious::Plugin::AssetPack::Pipe::VueTemplateCompiler
+
+2.104 	2020-12-25
+     Autoclean `assets/cache` dir
+     Cosmetics changes
