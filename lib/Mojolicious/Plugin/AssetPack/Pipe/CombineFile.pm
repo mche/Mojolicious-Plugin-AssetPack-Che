@@ -124,10 +124,10 @@ Mojolicious::Plugin::AssetPack::Pipe::CombineFile - Store combined and gzipped a
   $app->plugin('AssetPack::Che' => {
           pipes => [qw(Sass Css JavaScript CombineFile)],
           CombineFile => { gzip => {min_size => 1000},}, # pipe options
-          process => {
-            'foo.html'=>['templates/foo.html', 'templates/bar.html',],
+          process => [
+            ['foo.html'=>qw(templates/foo.html templates/bar.html)],
             ...,
-          },
+          ],
         });
 
 =head1 CONFIG

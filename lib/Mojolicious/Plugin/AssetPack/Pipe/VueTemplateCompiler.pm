@@ -175,12 +175,12 @@ Mojolicious::Plugin::AssetPack::Pipe::VueTemplateCompiler - if you like separate
 
   $app->plugin('AssetPack::Che' => {
           pipes => [qw(VueTemplateCompiler CombineFile)],
-          VueTemplateCompiler=>{enabled=>$ENV{MOJO_ASSETPACK_VueTemplateCompiler} || 0},
-          process => {
-            'js/dist/templates/app★.js?bla'=>['components/foo.vue.html', 'components/bar.vue.html',],
-            'app.js'=>[qw('js/dist/templates/app★.js components/foo.vue.js components/bar.vue.js)]
+          VueTemplateCompiler=>{enabled=>$ENV{MOJO_ASSETPACK_VUE_TEMPLATE_COMPILER} || 0},
+          process => [
+            ['js/dist/templates/app★.js?bla'=>qw(components/foo.vue.html components/bar.vue.html)],
+            ['app.js'=>qw('js/dist/templates/app★.js components/foo.vue.js components/bar.vue.js)],
             ...,
-          },
+          ],
         });
 
 =head1 Обязательно REQUIRED
@@ -196,7 +196,6 @@ Mojolicious::Plugin::AssetPack::Pipe::VueTemplateCompiler - if you like separate
 чтобы он не потрошил атрибуты src href для ассетов
 
   $ perl -pi.bak -e 's/const\s+ATTRS\s+=\s+{\n/const ATTRS = {}, ATTRS000 = {\n/' /tmp/node_modules/parcel-bundler/src/assets/HTMLAsset.js
-
 
 
 =head1 Конфигурация CONFIG
