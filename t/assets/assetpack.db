@@ -7,7 +7,7 @@ checksum=9c346fc356
 format=css
 minified=1
 [js-vue-template:js/App.vue.html]
-checksum=6c1be4ff9e
+checksum=2aecedc13c
 format=js
 minified=1
 [js-vue-template:js/components/Шаблон №1.vue.html]

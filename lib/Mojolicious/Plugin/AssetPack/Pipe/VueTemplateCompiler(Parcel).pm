@@ -6,7 +6,7 @@ use Mojo::Util qw(url_unescape decode);
 has config => sub { my $self = shift; my $config = $self->assetpack->config || $self->assetpack->config({}); $config->{VueTemplateCompiler} ||= {} };
 has enabled => sub { shift->config->{enabled} || 0 };
 #~ has parceljs => sub { [qw(parcel build --no-cache )] };#--out-file --out-dir
-#~ has parceljs => "/tmp/node_modules/parcel-bundler/bin/cli.js"; #--out-file --out-dir
+has parceljs => "/tmp/node_modules/parcel-bundler/bin/cli.js"; #--out-file --out-dir
 #~ has compiler => sub { Mojo::File->new(__FILE__)->sibling('vue-template-compiler.js') };
 has revision => sub { shift->assetpack->revision // '' };
 has _compiler => sub {
@@ -34,6 +34,8 @@ sub process {
   my $store = $self->assetpack->store;
   my $attrs = {key => "js-vue-template", url=>$topic, name=>decode('UTF-8', $topic), checksum=>$checksum, minified=>1, format=>$format,};# for store
   
+  
+  
   if ($self->assetpack->minify || !$self->enabled) {# production loads development
     #~ my $asset = $store->load($attrs)
     my $file = Mojo::File->new($self->app->static->paths->[0], $topic);
@@ -48,6 +50,9 @@ sub process {
   $assets->each(
     sub {
       my ($asset, $index) = @_;
+    #~ 
+    #~ for my $asset (@$assets) {
+
       return
        if $asset->format ne 'html' || $asset->minified;
       
@@ -62,8 +67,7 @@ sub process {
       my $url = url_unescape(Mojo::URL->new($asset->url)->path->to_string);
       #~ my $file = $asset->path; #Mojo::File
       #~ my $tmp_file_vue = $file->copy_to($file->new("/tmp/".$asset->name));#
-      #~ DEBUG &&  
-      diag "Compile Vue Template: [%s] to topic [%s] ", $url, $topic;#$self->assetpack->app->dumper($asset);#, $file->stat->size;join("", map(("$_=>"=>$attrs->{$_}), keys %$attrs))
+      DEBUG &&  diag "Compile Vue Template: [%s] to topic [%s] ", $url, $topic;#$self->assetpack->app->dumper($asset);#, $file->stat->size;join("", map(("$_=>"=>$attrs->{$_}), keys %$attrs))
   
       local $CWD = "/tmp";#$self->app->home->to_string;
       
@@ -83,18 +87,17 @@ sub process {
   #~ }
    
     
-    #~ my $tmp_vue = $asset->path->copy_to(Mojo::File->new("/tmp/".$asset->name));#
-      #~ $self->run(['node', $self->parceljs, 'build', ' --no-cache', '--out-file', $tmp_vue->path.'.js', '--out-dir', '.', $tmp_vue->path,  ], undef, undef,);# \my $content
-      #~ my $js = Mojo::File->new($tmp_vue->path.'.js');
+    my $tmp_vue = $asset->path->copy_to(Mojo::File->new("/tmp/".$asset->name));#
+      $self->run(['node', $self->parceljs, 'build', ' --no-cache', '--out-file', $tmp_vue->path.'.js', '--out-dir', '.', $tmp_vue->path,  ], undef, undef,);# \my $content
+      my $js = Mojo::File->new($tmp_vue->path.'.js');
       #~ diag sprintf qq|"%s":function(){%s}|, $asset->url, $self->_parse_render_function($js->slurp);
       #~ my $content = sprintf qq|"%s":function(){%s}|, $url, $self->_parse_render_function($js->slurp);
-      #~ my $content = sprintf qq|parcelRequire.register("%s", {%s});|, $url, $self->_parse_render_function($js->slurp);
-      #~ $tmp_vue->remove;
-      #~ $js->remove;
+      my $content = sprintf qq|parcelRequire.register("%s", {%s});|, $url, $self->_parse_render_function($js->slurp);
+      $tmp_vue->remove;
+      $js->remove;
       
-      $self->_install_node_modules('vue-template-compiler', '@vue/component-compiler-utils');
-      $self->run([$self->_find_app([qw(nodejs node)]), $self->_compiler->realpath], \$asset->content, \my $content);
-      $content = sprintf qq|parcelRequire.register("%s", (function(){%s; return {render,staticRenderFns};})());|, $url, $content;
+      #~ $self->run([$self->_find_app([qw(nodejs node)]), $self->_compiler->realpath], \$asset->content, \my $content);
+      #~ $content = sprintf qq|parcelRequire.register("%s", %s);|, $url, $content;
       push @content, $content;
       $asset->content($store->save(\$content, $attrs)->minified(1));
     }
@@ -123,11 +126,35 @@ sub _save_topic {
   $path->spurt($content);
 }
 
-#~ sub _compiler_file {
-  #~ my ($self, $topic) = @_;
-    #~ diag "_compiler [%s]", $tmp;
-  #~ my $mt = Mojo::Template->new;
-#~ }
+
+
+
+sub _parse_render_function {
+  my ($self, $data) = @_;
+  my @data = (&_br($data));
+
+  while (@data)  {
+    $data = shift @data;
+    return $data #(&_br($data))[0]
+      #~ and last
+      if $data =~ /^render\s*:\s*function/;
+    push @data, (&_br($data));
+  }
+}
+
+# regexp braces {}
+my $re;
+$re = qr{
+\s*\{\s*(
+    (?:
+       (?> [^{}]+ )       # Non-parens without backtracking
+       |
+       (??{$re})       # Group with matching parens
+    )*
+)\s*\}\s*
+}xm;
+# recursive braces {}
+sub _br {   return ($_[0] =~ /$re/g); }
  
 1;
 
@@ -201,7 +228,7 @@ Please report any bugs or feature requests at L<https://github.com/mche/Mojolici
 
 =head1 COPYRIGHT
 
-Copyright 2020-2021 Mikhail Che.
+Copyright 2020-2020 Mikhail Che.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -234,35 +261,23 @@ const util = require('@vue/component-compiler-utils');
 //process.stdout.write(JSON.stringify(c));
 ///process.stdout.write(c.render);
 
-/***
-  https://github.com/vuejs/component-compiler-utils#api
-***/
-
-let parse = util.parse({
-  source: stdinBuffer.toString(),
-  //~ filename?: string
-  compiler,
-  needMap: false,
-});
-
-
 let template = util.compileTemplate({
-  source: parse.template.content,
-  //~ filename: 
+  source: stdinBuffer.toString(),///html.value,
+  //~ filename: this.relativeName,
   compiler,
   isProduction: true,
   //~ transformAssetUrls: false,////susama
   //~ prettify:false,
-  //~ isFunctional:true,
+  //~ isFunctional:,
   //~ compilerOptions: {
     //~ scopeId
   //~ },
 });
 
 if (Array.isArray(template.errors) && template.errors.length >= 1) {
-  //~ throw new Error(template.errors[0]);
-  console.error(template.errors);
+  console.error(tempfile.errors);
+  throw new Error(template.errors[0]);
 }
-      
+
 process.stdout.write(template.code);
 
