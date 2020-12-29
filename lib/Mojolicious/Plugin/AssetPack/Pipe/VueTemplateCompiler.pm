@@ -69,18 +69,6 @@ sub process {
       
      #~ local $ENV{NODE_ENV}  = $self->app->mode;
     local $ENV{NODE_PATH} = '/tmp/node_modules';#$self->app->home->rel_file('node_modules');
-    # пофиксить /tmp/node_modules/parcel-bundler/src/assets/HTMLAsset.js
-    # строка:
-    # const ATTRS = {
-    # заменить:
-    # const ATTRS = {}, ATTRS000 = {
-    # /tmp/node_modules/parcel-bundler/bin/cli.js build --no-cache ...
-  
-  #~ unless (-f $self->parceljs) {#~ unless $self->{installed}++;
-    #~ $self->_install_node_modules('vue-template-compiler', 'parcel-bundler@1');
-    #~ ### `sed -i '/const ATTRS = {/c const ATTRS = {}, ATTRS000 = {' /tmp/node_modules/parcel-bundler/src/assets/HTMLAsset.js`;
-    #~ system q|perl -pi.bak -e 's/const\s+ATTRS\s+=\\s+{\n/const ATTRS = {}, ATTRS000 = {\n/' /tmp/node_modules/parcel-bundler/src/assets/HTMLAsset.js|;
-  #~ }
    
     
     #~ my $tmp_vue = $asset->path->copy_to(Mojo::File->new("/tmp/".$asset->name));#
@@ -155,25 +143,6 @@ Mojolicious::Plugin::AssetPack::Pipe::VueTemplateCompiler - if you like separate
             ...,
           ],
         });
-
-=head1 Обязательно REQUIRED
-
-Установить пакеты npm в папку /tmp:
-
-  $ cd /tmp
-  $ npm i vue-template-compiler parcel-bundler@1
-
-Короч, стал использовать Parcel-bundler (version < 2.0!) L<https://github.com/parcel-bundler/parcel>, пушто напрямую L<https://github.com/vuejs/vue/tree/dev/packages/vue-template-compiler#readme> выдает блоками with(this){...}
-
-Патчить строку #11 файлика B</tmp/node_modules/parcel-bundler/src/assets/HTMLAsset.js>,
-чтобы он не потрошил атрибуты src href для ассетов
-
-  $ perl -pi.bak -e 's/const\s+ATTRS\s+=\s+{\n/const ATTRS = {}, ATTRS000 = {\n/' /tmp/node_modules/parcel-bundler/src/assets/HTMLAsset.js
-  
-
-Еще патчить B</tmp/node_modules/parcel-bundler/src/assets/VueAsset.js>
-
-  $ perl -pi.bak -e 's/(\s+source:\s+)(html.value,\s+)/$1this.ast.template.content,\/\/\/$2/' /tmp/node_modules/parcel-bundler/src/assets/VueAsset.js
 
 
 =head1 Конфигурация CONFIG
