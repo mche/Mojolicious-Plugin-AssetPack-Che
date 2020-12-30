@@ -92,7 +92,7 @@ sub process {
     unless scalar @content;
   
   my $content = join "\n", @content;
-  $self->_save_topic($topic, $content);
+  my $path = $self->_save_topic($topic, $content);
   
   #~ my $asset = Mojolicious::Plugin::AssetPack::Asset->new(url => $topic)->checksum($checksum)->minified(1)
       #~ ->content($content);
@@ -101,6 +101,7 @@ sub process {
   #~ $self->assetpack->{by_checksum}{$checksum} 
   my $asset = $store->save(\$content, $attrs);#decode('UTF-8', $topic)
   $self->assetpack->{by_topic}{$topic} = [$asset];
+  #~ $self->assetpack->process($topic=>$path);
 }
 
 sub _save_topic {

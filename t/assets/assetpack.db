@@ -6,8 +6,20 @@ minified=1
 checksum=9c346fc356
 format=css
 minified=1
+[combine-file:js/App.js]
+checksum=fbbd3e4c74
+format=js
+minified=1
 [js-vue-template:js/App.vue.html]
 checksum=2aecedc13c
+format=js
+minified=1
+[combine-file:js/components/Hello.js]
+checksum=a27f2770fb
+format=js
+minified=1
+[combine-file-gzip:js/components/Hello.js.gzip]
+checksum=e8f610b000
 format=js
 minified=1
 [js-vue-template:js/components/Шаблон №1.vue.html]
@@ -24,6 +36,10 @@ format=js
 minified=1
 [combine-file-gzip:js/dist/рендер.js.gzip]
 checksum=bb98d4e47f
+format=js
+minified=1
+[combine-file:js/main.js]
+checksum=dae13fd6f3
 format=js
 minified=1
 [js-vue-template:js/файлы.vue.html]
