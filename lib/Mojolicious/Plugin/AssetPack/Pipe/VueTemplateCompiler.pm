@@ -62,8 +62,9 @@ sub process {
       my $url = url_unescape(Mojo::URL->new($asset->url)->path->to_string);
       #~ my $file = $asset->path; #Mojo::File
       #~ my $tmp_file_vue = $file->copy_to($file->new("/tmp/".$asset->name));#
-      #~ DEBUG &&  
+      #~ DEBUG &&  diag
       diag "Compile Vue Template: [%s] to topic [%s] ", $url, $topic;#$self->assetpack->app->dumper($asset);#, $file->stat->size;join("", map(("$_=>"=>$attrs->{$_}), keys %$attrs))
+      $self->app->log->info(sprintf "Compile Vue Template: [%s] to topic [%s] ", $url, $topic);
   
       local $CWD = "/tmp";#$self->app->home->to_string;
       
@@ -83,7 +84,7 @@ sub process {
       $self->_install_node_modules('vue-template-compiler', '@vue/component-compiler-utils');
       $self->run([$self->_find_app([qw(nodejs node)]), $self->_compiler->realpath], \$asset->content, \my $content);
       #~ $content = sprintf qq|parcelRequire.register("%s", (function(){%s; return {render,staticRenderFns};})());|, $url, $content;
-      $content = $self->mt->render($self->dist_template, {asset => $asset, asset_url => $url, content => $content});
+      $content = $self->mt->render($self->dist_template, {topic => $topic, asset => $asset, asset_url => $url, content => $content});
       push @content, $content;
       $asset->content($store->save(\$content, $attrs)->minified(1));
     }
